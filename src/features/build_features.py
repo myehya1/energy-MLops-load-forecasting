@@ -124,6 +124,21 @@ def create_rolling_features(df):
 
 
 # ==============================
+# CREATE TARGET FOR 24H FORECASTING
+# ==============================
+
+def create_target_24h(df):
+    print("Creating 24-hour ahead target...")
+    
+    # Shift actual load -24 hours forward (next day same hour)
+    df["target_24h"] = df[TARGET_COLUMN].shift(-24)
+    
+    print(f"Target column 'target_24h' created (predicting 24 hours ahead)")
+    
+    return df
+
+
+# ==============================
 # MAIN PIPELINE
 # ==============================
 
@@ -138,8 +153,9 @@ def main():
     df = create_time_features(df)
     df = create_lag_features(df)
     df = create_rolling_features(df)
+    df = create_target_24h(df)
 
-    # Drop rows created by lagging
+    # Drop rows created by lagging and target shifting
     df = df.dropna()
 
     df.to_csv(OUTPUT_PATH, index=False)
